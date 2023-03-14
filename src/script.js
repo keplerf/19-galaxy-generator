@@ -14,29 +14,60 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
+const parameters = {};
+
+parameters.count = 4000;
+parameters.size = 0.05;
+
+let particulesGeometry = null;
+let particulesMaterial = null;
+let particules = null;
+
 const generateGalaxy = () => {
-  const count = 4000;
-  const position = new Float32Array(count * 3);
+  if (particulesGeometry != null) {
+    particulesGeometry.dispose();
+    particulesMaterial.dispose();
+    scene.remove(particules);
+  }
+  const position = new Float32Array(parameters.count * 3);
 
-  const particulesGeometry = new THREE.BufferGeometry();
+  particulesGeometry = new THREE.BufferGeometry();
 
-  for (let i = 0; i < count; i++) {
-    position[i] = (Math.random() - 0.5) * 10;
+  for (let i = 0; i < parameters.count; i++) {
+    const i3 = i * 3;
+    position[i3] = (Math.random() - 0.5) * 10;
+    position[i3 + 1] = (Math.random() - 0.5) * 10;
+    position[i3 + 2] = (Math.random() - 0.5) * 10;
   }
   particulesGeometry.setAttribute(
     "position",
     new THREE.BufferAttribute(position, 3)
   );
 
-  const particulesMaterial = new THREE.PointsMaterial({ color: "red" });
-  particulesMaterial.size = 0.05;
+  particulesMaterial = new THREE.PointsMaterial({ color: "red" });
+  particulesMaterial.size = parameters.size;
+  particulesMaterial.sizeAttenuation = true;
 
-  const particules = new THREE.Points(particulesGeometry, particulesMaterial);
+  particules = new THREE.Points(particulesGeometry, particulesMaterial);
 
   scene.add(particules);
 };
 
 generateGalaxy();
+
+gui
+  .add(parameters, "count")
+  .min(100)
+  .max(10000)
+  .step(100)
+  .onFinishChange(generateGalaxy);
+
+gui
+  .add(parameters, "size")
+  .min(0.001)
+  .max(1)
+  .step(0.001)
+  .onFinishChange(generateGalaxy);
 
 /**
  * Sizes
