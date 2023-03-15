@@ -18,6 +18,8 @@ const parameters = {};
 
 parameters.count = 4000;
 parameters.size = 0.05;
+parameters.radius = 5;
+parameters.branches = 3;
 
 let particulesGeometry = null;
 let particulesMaterial = null;
@@ -35,9 +37,16 @@ const generateGalaxy = () => {
 
   for (let i = 0; i < parameters.count; i++) {
     const i3 = i * 3;
-    position[i3] = (Math.random() - 0.5) * 10;
-    position[i3 + 1] = (Math.random() - 0.5) * 10;
-    position[i3 + 2] = (Math.random() - 0.5) * 10;
+    const radius = Math.random() * parameters.radius;
+    const branchAngle =
+      ((i % parameters.branches) / parameters.branches) * Math.PI * 2;
+
+    // position[i3] = (Math.random() - 0.5) * 10;
+    // position[i3 + 1] = (Math.random() - 0.5) * 10;
+    // position[i3 + 2] = (Math.random() - 0.5) * 10;
+    position[i3] = Math.cos(branchAngle) * radius;
+    position[i3 + 1] = 0;
+    position[i3 + 2] = Math.sin(branchAngle) * radius;
   }
   particulesGeometry.setAttribute(
     "position",
@@ -60,6 +69,19 @@ gui
   .min(100)
   .max(10000)
   .step(100)
+  .onFinishChange(generateGalaxy);
+gui
+  .add(parameters, "branches")
+  .min(2)
+  .max(20)
+  .step(1)
+  .onFinishChange(generateGalaxy);
+
+gui
+  .add(parameters, "radius")
+  .min(0.01)
+  .max(20)
+  .step(0.01)
   .onFinishChange(generateGalaxy);
 
 gui
